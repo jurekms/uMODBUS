@@ -70,7 +70,7 @@ uint16_t	secondRegisterValue[2];
 
 
 #define FIRST_REGISTER_ADDRESS 	5
-#define SECOND_REGISTER_SDDRES 	7
+#define SECOND_REGISTER_ADDRESS	7
 
 
 uint8_t callbackReadHoldingRegisters( void ) {
@@ -96,7 +96,7 @@ uint8_t callbackReadHoldingRegisters( void ) {
 				MB_PROTOCOL_STATE.codeError = MB_ERR_ILLEGAL_DATA_ADDR;								//if number of register+address is outside of the scope send MB_ERR_ILLEGAL_DATA_ADDR
 			}
 			break;
-		case SECOND_REGISTER_SDDRES:
+		case SECOND_REGISTER_ADDRESS:
 			if(registersNb == 2) {																	//check - master want two registers pointed by reg sddress?
 				MB_FRAME_BUFFER.TxFn03.numberBytes = bytesNb;										//set number of bytes sending back to master
 				MB_FRAME_BUFFER.TxFn03.data_uint16[0] =  mbUtilSwapUint16(secondRegisterValue[0]);	//set value of registers

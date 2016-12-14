@@ -89,7 +89,7 @@ uint8_t callbackReadHoldingRegisters( void ) {
 		case FIRST_REGISTER_ADDRESS:																//send value of first register
 			if(registersNb == 1) {																	//check - master want one register pointed by reg sddress?
 				MB_FRAME_BUFFER.TxFn03.numberBytes = bytesNb;										//set number of bytes sending back to master
-				MB_FRAME_BUFFER.TxFn03.data_uint16[0] =  mbUtilSwapUint16(firstRegisterValue);		//set value of register
+				MB_FRAME_BUFFER.TxFn03.dataUint16[0] =  mbUtilSwapUint16(firstRegisterValue);		//set value of register
 				return MB_ERR_OK;																	//everything is OK we can send response to master
 			}
 			else {
@@ -99,8 +99,8 @@ uint8_t callbackReadHoldingRegisters( void ) {
 		case SECOND_REGISTER_ADDRESS:
 			if(registersNb == 2) {																	//check - master want two registers pointed by reg sddress?
 				MB_FRAME_BUFFER.TxFn03.numberBytes = bytesNb;										//set number of bytes sending back to master
-				MB_FRAME_BUFFER.TxFn03.data_uint16[0] =  mbUtilSwapUint16(secondRegisterValue[0]);	//set value of registers
-				MB_FRAME_BUFFER.TxFn03.data_uint16[1] =  mbUtilSwapUint16(secondRegisterValue[1]);
+				MB_FRAME_BUFFER.TxFn03.dataUint16[0] =  mbUtilSwapUint16(secondRegisterValue[0]);	//set value of registers
+				MB_FRAME_BUFFER.TxFn03.dataUint16[1] =  mbUtilSwapUint16(secondRegisterValue[1]);
 				return MB_ERR_OK;																	//everything is OK we can send response to master
 			}
 			else {
@@ -116,7 +116,36 @@ uint8_t callbackReadHoldingRegisters( void ) {
 }
 
 
+//function for write holding registers
 
+//register must be defined as a global variable we use register from demo of read holding register function firstRegisterValue
+
+
+uint8_t callbackWriteHoldingRegisters( void ) {
+
+	uint16_t registersStartAddress;														//reads from MODBUS request freame
+	uint16_t registersNb;																//reads from MODBUS request freame
+
+	registersStartAddress = mbUtilSwapUint16(MB_FRAME_BUFFER.RxFn16.startAddress); 		// write register start address
+	registersNb = mbUtilSwapUint16(MB_FRAME_BUFFER.RxFn16.numberRegs); 					// number of registers to write
+
+	switch (registersStartAddress) {
+		case FIRST_REGISTER_ADDRESS:																//write value of first register
+			if(registersNb == 1) {																	//check - master want to write one register pointed by reg sddress?
+
+				firstRegisterValue = mbUtilSwapUint16(MB_FRAME_BUFFER.RxFn16.dataUint16[0]);		//write value to register
+				return MB_ERR_OK;																	//everything is OK we can send response to master
+			}
+			else {
+				MB_PROTOCOL_STATE.codeError = MB_ERR_ILLEGAL_DATA_ADDR;								//if number of register+address is outside of the scope send MB_ERR_ILLEGAL_DATA_ADDR
+			}
+			break;
+		default:
+				MB_PROTOCOL_STATE.codeError = MB_ERR_ILLEGAL_DATA_ADDR;								//if address is not FIRST_REGISTER_ADDRESS  send MB_ERR_ILLEGAL_DATA_ADDR
+			break;
+		}
+	return MB_PROTOCOL_STATE.codeError;
+}
 
 
 
@@ -134,15 +163,20 @@ int main(void) {
 	//register callback function for handle MB_FN_READ_HOLDING_REGISTERS modbus function
 	mbRegisterFunctionHandler(1, MB_FN_READ_HOLDING_REGISTERS, callbackReadHoldingRegisters);
 
+	//register callback function for handle MB_FN_WRITE_HOLDING_REGISTERS modbus function
+	mbRegisterFunctionHandler(2, MB_FN_WRITE_HOLDING_REGISTERS, callbackWriteHoldingRegisters);
+
+
+
 	//init protocolo and UART
 	mbInit();
 	//enable interrupts
 	sei();
-
+	firstRegisterValue = 11;														//initialize first register, it can be writing from MASTER
 	//never ending loop
 	while (1 == 1) {
 																					//here you can set registers
-		firstRegisterValue = 10;													//first register for example data from AD converter
+
 		secondRegisterValue[0] = 72;												//second registers  for example data from 18B20 (temperature)
 		secondRegisterValue[1] = 34;
 	//poll modbus state-machine

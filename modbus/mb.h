@@ -125,7 +125,7 @@ typedef struct {
 //for 0x04 function (requesting the content of analog input register)
 typedef struct {
 	uint8_t  numberBytes;
-	uint16_t data_uint16[ MB_SIZE_DATA_UINT16_TX  ];
+	uint16_t dataUint16[ MB_SIZE_DATA_UINT16_TX  ];
 } TMBTxFn04;
 
 typedef struct {
@@ -141,7 +141,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t numberBytes;
-	uint8_t data_uint8[ MB_SIZE_DATA_UINT8_TX  ];
+	uint8_t dataUint8[ MB_SIZE_DATA_UINT8_TX  ];
 } TMBTxFn01;
 
 //for 0x03 function (requesting the content of analog output holding registers)
@@ -152,7 +152,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t  numberBytes;
-	uint16_t data_uint16[ MB_SIZE_DATA_UINT16_TX  ];
+	uint16_t dataUint16[ MB_SIZE_DATA_UINT16_TX  ];
 } TMBTxFn03;
 
 //for exception
